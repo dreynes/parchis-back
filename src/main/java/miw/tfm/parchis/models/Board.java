@@ -56,6 +56,7 @@ public class Board {
         assignSquares(SQUARE_HOME_VALUES_BLUE, Square.class, "blue", "HomeSquare", this.board, this.homes[2]);
         assignSquares(SQUARE_HOME_VALUES_YELLOW, Square.class, "yellow", "HomeSquare", this.board, this.homes[3]);
         assignSquares(SQUARE_BLACK_BORDER, Square.class, "black", "Border", this.board, null);
+        this.board[8][8] = new Goal(145);
         fillRemainingSquares(this.board);
     }
 

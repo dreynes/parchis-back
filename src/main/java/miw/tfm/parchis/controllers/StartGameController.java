@@ -3,7 +3,6 @@ package miw.tfm.parchis.controllers;
         import miw.tfm.parchis.models.Board;
         import miw.tfm.parchis.models.FinalTrack;
         import miw.tfm.parchis.models.Home;
-        import miw.tfm.parchis.models.Square;
         import miw.tfm.parchis.services.StartGameService;
         import org.springframework.beans.factory.annotation.Autowired;
         import org.springframework.http.ResponseEntity;
