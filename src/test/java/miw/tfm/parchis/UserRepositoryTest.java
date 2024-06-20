@@ -2,7 +2,6 @@ package miw.tfm.parchis;
 
 import miw.tfm.parchis.mongo.dto.UserEntity;
 import miw.tfm.parchis.mongo.repositories.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

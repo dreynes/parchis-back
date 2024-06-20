@@ -82,4 +82,12 @@ public class AuthenticationControllerTest {
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
         assertEquals("Credenciales inválidas", response.getBody());
     }
+
+    @Test
+    public void testLogout() {
+        ResponseEntity<?> response = authenticationController.logout();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Logout successful", response.getBody());
+    }
 }

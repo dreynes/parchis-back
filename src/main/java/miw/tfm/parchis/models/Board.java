@@ -61,7 +61,6 @@ public class Board {
                     ((FinalTrack) section).addSquare((SquareSafe) square);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
             }
         }
     }
