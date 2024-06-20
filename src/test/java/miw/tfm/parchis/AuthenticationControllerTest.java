@@ -4,7 +4,7 @@ import miw.tfm.parchis.controllers.AuthenticationController;
 import miw.tfm.parchis.models.UserModel;
 import miw.tfm.parchis.mongo.dto.UserEntity;
 import miw.tfm.parchis.security.JwtUtil;
-import miw.tfm.parchis.services.UserService;
+import miw.tfm.parchis.services.UserResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 public class AuthenticationControllerTest {
 
     @Mock
-    private UserService userService;
+    private UserResource userResource;
 
     @Mock
     private JwtUtil jwtUtil;
@@ -37,7 +37,7 @@ public class AuthenticationControllerTest {
     @Test
     public void testRegisterUserAlreadyExists() {
         UserModel user = new UserModel("existingUser", "password");
-        when(userService.existUser(user)).thenReturn(true);
+        when(userResource.existUser(user)).thenReturn(true);
 
         ResponseEntity<?> response = authenticationController.register(user);
 
@@ -48,9 +48,9 @@ public class AuthenticationControllerTest {
     @Test
     public void testRegisterUserSuccess() {
         UserModel user = new UserModel("newUser", "password");
-        when(userService.existUser(user)).thenReturn(false);
+        when(userResource.existUser(user)).thenReturn(false);
         UserEntity expectedUser = new UserEntity(user);
-        when(userService.register(user)).thenReturn(expectedUser);
+        when(userResource.register(user)).thenReturn(expectedUser);
 
         ResponseEntity<?> response = authenticationController.register(user);
 
@@ -63,7 +63,7 @@ public class AuthenticationControllerTest {
     @Test
     public void testLoginSuccess() {
         UserModel user = new UserModel("validUser", "password");
-        when(userService.authenticate(user.getUsername(), user.getPassword())).thenReturn(true);
+        when(userResource.authenticate(user.getUsername(), user.getPassword())).thenReturn(true);
         when(jwtUtil.generateToken(user.getUsername())).thenReturn("jwtToken");
 
         ResponseEntity<?> response = authenticationController.login(user);
@@ -75,7 +75,7 @@ public class AuthenticationControllerTest {
     @Test
     public void testLoginFailure() {
         UserModel user = new UserModel("invalidUser", "wrongPassword");
-        when(userService.authenticate(user.getUsername(), user.getPassword())).thenReturn(false);
+        when(userResource.authenticate(user.getUsername(), user.getPassword())).thenReturn(false);
 
         ResponseEntity<?> response = authenticationController.login(user);
 

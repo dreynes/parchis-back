@@ -3,7 +3,7 @@ package miw.tfm.parchis.controllers;
         import miw.tfm.parchis.models.Board;
         import miw.tfm.parchis.models.FinalTrack;
         import miw.tfm.parchis.models.Home;
-        import miw.tfm.parchis.services.StartGameService;
+        import miw.tfm.parchis.services.StartGameResource;
         import org.springframework.beans.factory.annotation.Autowired;
         import org.springframework.http.ResponseEntity;
         import org.springframework.web.bind.annotation.GetMapping;
@@ -19,11 +19,11 @@ package miw.tfm.parchis.controllers;
 @RequestMapping("/api/game")
 public class StartGameController {
     @Autowired
-    private StartGameService startGameService;
+    private StartGameResource startGameResource;
 
     @GetMapping("/create")
     public ResponseEntity<Map<String, Object>> createGame() {
-        Board board = startGameService.createGame();
+        Board board = startGameResource.createGame();
         Map<String, Object> response = new HashMap<>();
         response.put("board", board.getBoard());
         response.put("circuit", board.getCircuit().getSquares());
