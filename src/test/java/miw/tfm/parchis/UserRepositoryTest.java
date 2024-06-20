@@ -19,11 +19,6 @@ public class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    @BeforeEach
-    public void setUp() {
-        userRepository.deleteAll();
-    }
-
     @Test
     public void testFindByUsername() {
         UserEntity user = new UserEntity();
@@ -36,6 +31,9 @@ public class UserRepositoryTest {
         assertNotNull(foundUser);
         assertEquals("testuserRepo", foundUser.getUsername());
         assertEquals("password", foundUser.getPassword());
+
+        // Eliminamos el usuario registrado
+        userRepository.deleteByUsername("testuserRepo");
     }
 
     @Test
@@ -43,7 +41,6 @@ public class UserRepositoryTest {
         UserEntity user = new UserEntity();
         user.setUsername("anotheruser");
         user.setPassword("anotherpassword");
-
         UserEntity savedUser = userRepository.save(user);
         String userId = savedUser.getId();
 
@@ -52,5 +49,7 @@ public class UserRepositoryTest {
         assertNotNull(retrievedUser);
         assertEquals("anotheruser", retrievedUser.getUsername());
         assertEquals("anotherpassword", retrievedUser.getPassword());
+
+        userRepository.deleteById(userId);
     }
 }

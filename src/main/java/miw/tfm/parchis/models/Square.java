@@ -1,6 +1,5 @@
 package miw.tfm.parchis.models;
 
-import miw.tfm.parchis.models.Piece;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,16 +8,23 @@ public class Square {
     private int value;
     private String color;
     private String type;
-    private List<Piece> pieces = new ArrayList<>();
+    private List<Piece> pieces;
 
     // Constructor
     public Square(int value, String color, String type) {
         this.value = value;
         this.color = color;
         this.type = type;
+        this.pieces = new ArrayList<>();
     }
 
-    // Getters y Setters
+    public void putPiece(Piece piece){
+        this.pieces.add(piece);
+
+    }
+    public boolean isEmpty(){
+        return this.pieces.size()==0;
+    }
     public int getValue() {
         return value;
     }

@@ -1,6 +1,7 @@
 package miw.tfm.parchis;
 
 import miw.tfm.parchis.models.Board;
+import miw.tfm.parchis.models.Parchis;
 import miw.tfm.parchis.services.StartGameResource;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -11,8 +12,8 @@ public class StartGameResourceTest {
 
     @Test
     public void testCreateGame() {
-        Board board = startGameResource.createGame();
-
+        Parchis parchis = startGameResource.createGame();
+        Board board = parchis.getBoard();
         assertThat(board).isNotNull();
         assertThat(board.getBoard()).isNotNull().isNotEmpty();
         assertThat(board.getCircuit()).isNotNull();

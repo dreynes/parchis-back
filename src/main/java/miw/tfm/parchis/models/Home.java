@@ -5,9 +5,12 @@ import java.util.List;
 
 public class Home {
     private List<Square> squares;
-
-    public Home() {
+    private List<Piece> pieces;
+    private String color;
+    public Home(String color) {
+        this.color = color;
         this.squares = new ArrayList<>();
+        this.pieces = new ArrayList<>();
     }
 
     public void addSquare(Square square) {
@@ -21,5 +24,20 @@ public class Home {
     public void setSquares(List<Square> squares) {
         this.squares = squares;
     }
+
+    public void putPiece(Piece piece) {
+        for (Square square : squares) {
+            if (square.isEmpty()) {
+                square.putPiece(piece);
+                this.pieces.add(piece);
+                return;
+            }
+
+        }
+    }
+    public String getColor() {
+        return this.color;
+    }
 }
+
 

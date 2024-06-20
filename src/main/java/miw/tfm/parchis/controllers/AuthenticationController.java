@@ -44,7 +44,6 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserModel user) {
-        System.out.println("llega al controller");
         if (userResource.authenticate(user.getUsername(), user.getPassword())) {
             final String jwt = jwtUtil.generateToken(user.getUsername());
             Map<String, String> response = new HashMap<>();
