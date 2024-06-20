@@ -116,4 +116,16 @@ public class Board {
     public FinalTrack[] getFinalTracks() {
         return finalTracks;
     }
+
+    public void setCircuit(Circuit circuit) {
+    }
+
+    public void setBoard(Square[][] squares) {
+    }
+
+    public void setHomes(Home[] homes) {
+    }
+
+    public void setFinalTracks(FinalTrack[] finalTracks) {
+    }
 }
