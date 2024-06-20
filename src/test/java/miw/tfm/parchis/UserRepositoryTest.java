@@ -2,33 +2,63 @@ package miw.tfm.parchis;
 
 import miw.tfm.parchis.mongo.dto.UserEntity;
 import miw.tfm.parchis.mongo.repositories.UserRepository;
-import org.apache.catalina.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@SpringBootTest
+@ExtendWith(SpringExtension.class)
+@DataMongoTest
 public class UserRepositoryTest {
+
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
+
+    @BeforeEach
+    public void setUp() {
+        // Limpiar la base de datos de pruebas antes de cada prueba
+        userRepository.deleteAll();
+    }
 
     @Test
-    void findUserByUsername() {
-        // Crea un usuario de prueba
+    public void testFindByUsername() {
+        // Arrange: crear y guardar un usuario
         UserEntity user = new UserEntity();
-        user.setUsername("testUser");
-        user.setPassword("testPassword");
-
-        // Guarda el usuario en la base de datos
+        user.setUsername("testuserRepo");
+        user.setPassword("password");
         userRepository.save(user);
 
-        // Busca el usuario por nombre de usuario
-        UserEntity foundUser = userRepository.findByUsername("testUser");
+        // Act: buscar el usuario por nombre de usuario
+        UserEntity foundUser = userRepository.findByUsername("testuserRepo");
 
-        // Verifica que se haya encontrado un usuario
+        // Assert: verificar que se encuentra el usuario correcto
         assertNotNull(foundUser);
+        assertEquals("testuserRepo", foundUser.getUsername());
+        assertEquals("password", foundUser.getPassword());
+    }
 
+    @Test
+    public void testSaveAndRetrieveUser() {
+        // Arrange: crear un nuevo usuario
+        UserEntity user = new UserEntity();
+        user.setUsername("anotheruser");
+        user.setPassword("anotherpassword");
+
+        // Act: guardar el usuario y obtener el ID generado
+        UserEntity savedUser = userRepository.save(user);
+        String userId = savedUser.getId();
+
+        // Recuperar el usuario usando el ID
+        UserEntity retrievedUser = userRepository.findById(userId).orElse(null);
+
+        // Assert: verificar que se recupera el usuario correcto
+        assertNotNull(retrievedUser);
+        assertEquals("anotheruser", retrievedUser.getUsername());
+        assertEquals("anotherpassword", retrievedUser.getPassword());
     }
 }
