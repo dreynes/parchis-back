@@ -56,4 +56,8 @@ public class Square {
     public void setPieces(List<Piece> pieces) {
         this.pieces = pieces;
     }
+
+    public int getPosition() {
+        return this.value;
+    }
 }

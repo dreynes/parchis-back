@@ -40,7 +40,7 @@ public class Board {
         fillRemainingSquares(this.board);
     }
 
-    private Coordinate getPositionFromValue(int value) {
+    public Coordinate getPositionFromValue(int value) {
         int index = value - 1;
         int col = index / nCols;
         int row = index % nRows;
