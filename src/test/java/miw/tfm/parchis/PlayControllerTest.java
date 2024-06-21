@@ -27,6 +27,7 @@ public class PlayControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        playController = new PlayController(sessionState, playResource);
     }
 
     @Test
@@ -37,5 +38,15 @@ public class PlayControllerTest {
 
         assertThat(response.getStatusCodeValue()).isEqualTo(200);
         assertThat(response.getBody()).isEqualTo(4);
+    }
+
+    @Test
+    void testCanMove() {
+        when(playResource.canMove()).thenReturn(true);
+
+        ResponseEntity<Boolean> response = playController.canMove();
+
+        assertThat(response.getStatusCodeValue()).isEqualTo(200);
+        assertThat(response.getBody()).isTrue();
     }
 }
