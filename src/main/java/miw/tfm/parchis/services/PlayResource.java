@@ -21,8 +21,4 @@ public class PlayResource {
         return dice.roll();
     }
 
-    public Boolean canMove(){
-        Dice dice = sessionState.getParchis().getDice();
-        return true;
-    }
 }

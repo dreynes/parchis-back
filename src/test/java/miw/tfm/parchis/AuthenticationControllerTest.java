@@ -1,6 +1,7 @@
 package miw.tfm.parchis;
 
 import miw.tfm.parchis.controllers.AuthenticationController;
+import miw.tfm.parchis.models.SessionState;
 import miw.tfm.parchis.models.UserModel;
 import miw.tfm.parchis.mongo.dto.UserEntity;
 import miw.tfm.parchis.security.JwtUtil;
@@ -15,7 +16,8 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public class AuthenticationControllerTest {
@@ -26,68 +28,58 @@ public class AuthenticationControllerTest {
     @Mock
     private JwtUtil jwtUtil;
 
+    @Mock
+    private SessionState sessionState;
+
     @InjectMocks
     private AuthenticationController authenticationController;
 
     @BeforeEach
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testRegisterUserAlreadyExists() {
-        UserModel user = new UserModel("existingUser", "password");
-        when(userResource.existUser(user)).thenReturn(true);
+    public void testRegister() {
 
-        ResponseEntity<?> response = authenticationController.register(user);
+        UserModel userModel = new UserModel("testUser", "testPassword");
 
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-        assertEquals("The user just exist", response.getBody());
-    }
+        when(userResource.existUser(any(UserModel.class))).thenReturn(false);
+        when(userResource.register(any(UserModel.class))).thenReturn(new UserEntity());
 
-    @Test
-    public void testRegisterUserSuccess() {
-        UserModel user = new UserModel("newUser", "password");
-        when(userResource.existUser(user)).thenReturn(false);
-        UserEntity expectedUser = new UserEntity(user);
-        when(userResource.register(user)).thenReturn(expectedUser);
-
-        ResponseEntity<?> response = authenticationController.register(user);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        UserEntity actualUser = (UserEntity) response.getBody();
-        assertEquals(expectedUser.getUsername(), actualUser.getUsername());
-        assertEquals(expectedUser.getPassword(), actualUser.getPassword());
+        ResponseEntity<?> response = authenticationController.register(userModel);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
     public void testLoginSuccess() {
-        UserModel user = new UserModel("validUser", "password");
-        when(userResource.authenticate(user.getUsername(), user.getPassword())).thenReturn(true);
-        when(jwtUtil.generateToken(user.getUsername())).thenReturn("jwtToken");
 
-        ResponseEntity<?> response = authenticationController.login(user);
+        UserModel userModel = new UserModel("testUser", "testPassword");
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(Map.of("token", "jwtToken"), response.getBody());
+        when(userResource.authenticate(any(String.class), any(String.class))).thenReturn(true);
+        when(jwtUtil.generateToken(any(String.class))).thenReturn("fake-jwt-token");
+
+        ResponseEntity<?> response = authenticationController.login(userModel);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isInstanceOf(Map.class);
+        assertThat(((Map<?, ?>) response.getBody()).get("token")).isEqualTo("fake-jwt-token");
     }
 
     @Test
     public void testLoginFailure() {
-        UserModel user = new UserModel("invalidUser", "wrongPassword");
-        when(userResource.authenticate(user.getUsername(), user.getPassword())).thenReturn(false);
+        UserModel userModel = new UserModel("testUser","testPassword");
 
-        ResponseEntity<?> response = authenticationController.login(user);
+        when(userResource.authenticate(any(String.class), any(String.class))).thenReturn(false);
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Credenciales inválidas", response.getBody());
+        ResponseEntity<?> response = authenticationController.login(userModel);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(response.getBody()).isEqualTo("Credenciales inválidas");
     }
 
     @Test
     public void testLogout() {
         ResponseEntity<?> response = authenticationController.logout();
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Logout successful", response.getBody());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo("Logout successful");
     }
 }

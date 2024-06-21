@@ -13,20 +13,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class PlayController {
 
     private final SessionState sessionState;
-
-    @Autowired
     private PlayResource playResource;
 
     @Autowired
-    public PlayController(SessionState sessionState) {
+    public PlayController(SessionState sessionState, PlayResource playResource) {
         this.sessionState = sessionState;
+        this.playResource = playResource;
     }
+
     @GetMapping("/rollDice")
     public ResponseEntity<Integer> rollDice() {
        return ResponseEntity.ok(playResource.rollDice());
-    }
-    @GetMapping("/canMove")
-    public ResponseEntity<Boolean> canMove() {
-        return ResponseEntity.ok(playResource.canMove());
     }
 }
