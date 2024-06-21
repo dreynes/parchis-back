@@ -3,7 +3,7 @@ package miw.tfm.parchis.models;
 public class Dice {
 
 
-    private int value;
+    private int value = 0;
     public Dice(){}
 
     public int roll(){

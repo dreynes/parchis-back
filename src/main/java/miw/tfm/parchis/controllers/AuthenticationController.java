@@ -1,5 +1,6 @@
 package miw.tfm.parchis.controllers;
 
+import miw.tfm.parchis.models.SessionState;
 import miw.tfm.parchis.models.UserModel;
 import miw.tfm.parchis.mongo.dto.UserEntity;
 import miw.tfm.parchis.security.JwtUtil;
@@ -24,10 +25,13 @@ public class AuthenticationController {
     private UserResource userResource;
     private final JwtUtil jwtUtil;
 
+    private final SessionState sessionState;
     @Autowired
-    public AuthenticationController(UserResource userResource, JwtUtil jwtUtil) {
+    public AuthenticationController(UserResource userResource, JwtUtil jwtUtil, SessionState sessionState) {
         this.userResource = userResource;
         this.jwtUtil = jwtUtil;
+        this.sessionState = sessionState;
+
     }
 
     @PostMapping("/register")
@@ -48,6 +52,7 @@ public class AuthenticationController {
             final String jwt = jwtUtil.generateToken(user.getUsername());
             Map<String, String> response = new HashMap<>();
             response.put("token", jwt);
+            sessionState.setUser(user);
             return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
@@ -56,6 +61,7 @@ public class AuthenticationController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
+        sessionState.setUser(null);
         return ResponseEntity.ok("Logout successful");
     }
 }

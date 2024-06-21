@@ -1,10 +1,9 @@
 package miw.tfm.parchis.controllers;
 
-        import miw.tfm.parchis.models.Board;
-        import miw.tfm.parchis.models.FinalTrack;
-        import miw.tfm.parchis.models.Home;
-        import miw.tfm.parchis.models.Parchis;
+        import miw.tfm.parchis.models.*;
+        import miw.tfm.parchis.security.JwtUtil;
         import miw.tfm.parchis.services.StartGameResource;
+        import miw.tfm.parchis.services.UserResource;
         import org.springframework.beans.factory.annotation.Autowired;
         import org.springframework.http.ResponseEntity;
         import org.springframework.web.bind.annotation.GetMapping;
@@ -22,9 +21,18 @@ public class StartGameController {
     @Autowired
     private StartGameResource startGameResource;
 
+    private final SessionState sessionState;
+
+    @Autowired
+    public StartGameController(SessionState sessionState) {
+        this.sessionState = sessionState;
+    }
+
+
     @GetMapping("/create/initializeBoard")
     public ResponseEntity<Map<String, Object>> createGame() {
         Parchis parchis = startGameResource.createGame();
+        sessionState.setParchis(parchis);
         Board board = parchis.getBoard();
         Map<String, Object> response = new HashMap<>();
         response.put("board", board.getBoard());
