@@ -37,7 +37,7 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserModel user) {
         if(userResource.existUser(user)){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("The user just exist");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("The user already exists");
         }
         System.out.println(user);
         UserEntity newUser = userResource.register(user);
@@ -60,7 +60,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
+    public ResponseEntity<String> logout() {
         sessionState.setUser(null);
         return ResponseEntity.ok("Logout successful");
     }

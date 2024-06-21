@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -49,6 +50,18 @@ public class AuthenticationControllerTest {
 
         ResponseEntity<?> response = authenticationController.register(userModel);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+
+    @Test
+    public void testRegisterUserAlreadyExists() {
+        UserModel user = new UserModel("existingUser", "password");
+        when(userResource.existUser(user)).thenReturn(true);
+
+        ResponseEntity<?> response = authenticationController.register(user);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("The user already exists", response.getBody());
     }
 
     @Test
