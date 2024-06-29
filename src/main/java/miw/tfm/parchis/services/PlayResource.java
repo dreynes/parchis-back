@@ -43,13 +43,14 @@ public class PlayResource {
     }
 
 
-    public void exitPiece() {
+    public Piece exitPiece() {
         int turnValue = this.sessionState.getParchis().getTurn().getCurrentPlayer();
         Home home = this.sessionState.getParchis().getBoard().getHomes()[turnValue];
         Piece piece = home.exitPiece();
         Circuit circuit = this.sessionState.getParchis().getBoard().getCircuit();
         SquareExit squareExit = circuit.getExitSquare(turnValue);
         squareExit.putPiece(piece);
+        return piece;
     }
 
     public Color changeTurn() {
@@ -102,9 +103,12 @@ public class PlayResource {
 
     public Boolean isValidMove(Piece piece, int diceValue, List<Integer> path) {
         int positionInitial = path.indexOf(piece.getPosition());
-        if (piece.getPosition() == 0)
+        if (piece.getPosition() == 0){
+            System.out.println("la pieza tiene posicion 0 esta en casa");
             return false;
+        }
         if (positionInitial == -1) {
+            System.out.println("la pieza tiene posicion -1 esta en el finalTrack");
             return isValidMoveInFinalTrack(piece.getPosition(), diceValue);
         }
         if (positionInitial + diceValue >= path.size()) {
@@ -118,11 +122,13 @@ public class PlayResource {
             int squareValue = path.get(positionInitial + i);
             Square square = this.sessionState.getParchis().getBoard().getSquareFromValue(squareValue);
             if (square.hasBlockade()) {
+                System.out.println("hay bloqueos");
                 return false;
             }
         }
         Square square = this.sessionState.getParchis().getBoard().getSquareFromValue(positionInitial + diceValue);
         if (!square.canPutPiece()) {
+            System.out.println("casilla destino llena");
             return false;
         }
         return true;
@@ -133,6 +139,7 @@ public class PlayResource {
         Player player = this.sessionState.getParchis().getCurrentPlayer();
         List<Integer> path = player.getPath();
         if (!player.getColor().equals(piece.getColor())) {
+            System.out.println("no coinciden los colores");
             return false;
         }
         if (!isValidMove(piece, diceValue, path)) {

@@ -57,7 +57,7 @@ public class PlayControllerTest {
 
     @Test
     public void testExitPiece() {
-        doNothing().when(playResource).exitPiece();
+        when(playResource.exitPiece()).thenReturn(new Piece("red"));
         ResponseEntity<Void> response = playController.exitPiece();
         assertEquals(ResponseEntity.ok().build(), response);
     }

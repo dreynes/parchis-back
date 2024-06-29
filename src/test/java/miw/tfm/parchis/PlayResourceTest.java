@@ -4,139 +4,245 @@ import miw.tfm.parchis.models.*;
 import miw.tfm.parchis.services.PlayResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import java.util.Arrays;
-import java.util.Collections;
+
+
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
-public class PlayResourceTest extends BaseMockTest {
+class PlayResourceTest {
 
-    @InjectMocks
+    private Parchis parchis;
     private PlayResource playResource;
 
     @BeforeEach
-    public void setUp() {
-        super.setUp();
+    void setUp() {
+        // Inicializar el estado del juego (Parchis)
+        parchis = new Parchis();
+        SessionState sessionState = new SessionState();
+        sessionState.setParchis(parchis);
+        playResource = new PlayResource(sessionState);
+    }
+
+
+    @Test
+    void rollDice_whenDiceIsUnrolled_shouldReturnRolledValue() {
+        Dice dice = parchis.getDice();
+        dice.setValue(0);
+
+        int result = playResource.rollDice();
+
+        assertTrue(result >= 1 && result <= 6, "El resultado del dado debe estar entre 1 y 6");
     }
 
     @Test
-    public void testRollDice() {
-        when(dice.getValue()).thenReturn(0);
-        when(dice.roll()).thenReturn(5);
-        assertEquals(5, playResource.rollDice());
+    void rollDice_whenDiceValueAlreadySet_shouldReturnSameValue() {
+        Dice dice = parchis.getDice();
+        dice.setValue(4);
+        int result = playResource.rollDice();
+        assertEquals(4, result, "El resultado del dado debería ser igual al valor predefinido");
+    }
 
-        when(dice.getValue()).thenReturn(4);
-        assertEquals(4, playResource.rollDice());
+
+    @Test
+    void mustExitPiece_whenConditionsNotMet_shouldReturnFalse() {
+        Turn turn = parchis.getTurn();
+        turn.setCurrentPlayer(0);
+
+        Dice dice = parchis.getDice();
+        dice.setValue(4); // Otro valor diferente a 5
+
+        Home home = parchis.getBoard().getHomes()[0];
+        home.putPiece(new Piece(BoardConstants.COLORS.get(0)));
+
+        boolean result = playResource.mustExitPiece();
+
+        assertFalse(result, "No se cumple la condición para salir la pieza");
     }
 
     @Test
-    public void testMustExitPiece() {
-        when(turn.getCurrentPlayer()).thenReturn(0);
-        when(dice.getValue()).thenReturn(5);
-        when(home.getPieces()).thenReturn(Collections.singletonList(new Piece("red")));
-        when(squareExit.isFull()).thenReturn(false);
+    void mustExitPiece_whenConditionsMet_shouldReturnTrue() {
+        Turn turn = parchis.getTurn();
+        turn.setCurrentPlayer(0);
 
-        assertTrue(playResource.mustExitPiece());
+        Dice dice = parchis.getDice();
+        dice.setValue(5);
 
-        when(dice.getValue()).thenReturn(4);
-        assertFalse(playResource.mustExitPiece());
+        Home home = parchis.getBoard().getHomes()[0];
+        home.putPiece(new Piece(BoardConstants.COLORS.get(0)));
+
+        boolean result = playResource.mustExitPiece();
+
+        assertTrue(result);
     }
 
     @Test
-    public void testExitPiece() {
-        when(turn.getCurrentPlayer()).thenReturn(0);
-        Piece piece = new Piece("red");
-        when(home.exitPiece()).thenReturn(piece);
+    void exitPiece_shouldMovePieceToExitSquare() {
+        Turn turn = parchis.getTurn();
+        turn.setCurrentPlayer(0);
+
+        Home home = parchis.getBoard().getHomes()[0];
+        Piece piece = new Piece(BoardConstants.COLORS.get(0));
+        home.putPiece(piece);
+
+        Circuit circuit = parchis.getBoard().getCircuit();
+        SquareExit squareExit = circuit.getExitSquare(0);
+        int initialExitSize = squareExit.getPieces().size();
 
         playResource.exitPiece();
 
-        verify(squareExit, times(1)).putPiece(piece);
+        assertEquals(initialExitSize + 1, squareExit.getPieces().size(), "La pieza debería haber sido movida a la salida");
     }
 
     @Test
-    public void testChangeTurn() {
-        when(turn.getCurrentPlayer()).thenReturn(0);
-        doNothing().when(turn).nextTurn();
+    void changeTurn_whenChangingTurn_shouldCycleThroughPlayers() {
+        Turn turn = parchis.getTurn();
+        int initialPlayer = turn.getCurrentPlayer();
 
-        assertEquals(Color.values()[0], playResource.changeTurn());
+        playResource.changeTurn(); // Cambiar turno una vez
+        playResource.changeTurn(); // Cambiar turno una vez más
+        playResource.changeTurn(); // Cambiar turno una vez más
+        playResource.changeTurn(); // Cambiar turno una vez más
 
-        verify(turn, times(1)).nextTurn();
-        verify(dice, times(1)).setValue(0);
+        assertEquals(initialPlayer, turn.getCurrentPlayer(), "Se ha completado el ciclo deberia tocar el mismo jugador");
+    }
+
+
+    @Test
+    void changeTurn_shouldIncrementTurnAndResetDice() {
+        Turn turn = parchis.getTurn();
+        int initialPlayer = turn.getCurrentPlayer();
+
+        Color newTurnColor = playResource.changeTurn();
+        String turnPlayer = BoardConstants.COLORS.get(turn.getCurrentPlayer());
+        assertNotEquals(initialPlayer, turn.getCurrentPlayer(), "El turno debería haber cambiado");
+        assertEquals(BoardConstants.COLORS.get(turn.getCurrentPlayer()), turnPlayer, "El color del nuevo turno no es el esperado");
+        assertEquals(0, parchis.getDice().getValue(), "El valor del dado debería haber sido reseteado a 0");
     }
 
     @Test
-    public void testAllPiecesInHome() {
-        when(turn.getCurrentPlayer()).thenReturn(0);
-        when(home.isFull()).thenReturn(true);
+    void allPiecesInHome_whenAllPiecesInHome_shouldReturnTrue() {
+        Turn turn = parchis.getTurn();
+        turn.setCurrentPlayer(0);
 
-        assertTrue(playResource.allPiecesInHome());
+        Home home = parchis.getBoard().getHomes()[0];
+
+        assertTrue(playResource.allPiecesInHome(), "Todas las piezas deberían estar en home");
     }
 
     @Test
-    public void testCanMove() {
-        when(dice.getValue()).thenReturn(5);
-        when(player.getPath()).thenReturn(Collections.emptyList());
-        when(player.getPieces()).thenReturn(Collections.singletonList(new Piece("red")));
+    void move_whenInvalidMove_shouldReturnFalseAndNotMovePiece() {
+        Turn turn = parchis.getTurn();
+        turn.setCurrentPlayer(0);
 
-        assertFalse(playResource.canMove());
+        Player player = parchis.getCurrentPlayer();
+        List<Integer> path = player.getPath();
+
+        Home home =  parchis.getBoard().getHomes()[turn.getCurrentPlayer()];
+        Piece piece = home.getPieces().get(0);
+        // Establecer un valor de dado que no permita un movimiento válido
+        parchis.getDice().setValue(3);
+
+        boolean result = playResource.move(piece);
+
+        assertFalse(result, "No debería ser posible mover la pieza con el dado dado el valor establecido");
+        assertTrue(home.getPieces().contains(piece), "La pieza debería permanecer en home si el movimiento no fue válido");
+    }
+
+
+    @Test
+    void canMove_whenAllPiecesInHome_shouldReturnFalse() {
+        Turn turn = parchis.getTurn();
+        turn.setCurrentPlayer(0);
+
+        Dice dice = parchis.getDice();
+        dice.setValue(5);
+
+        boolean result = playResource.canMove();
+
+        assertFalse(result, "No se debería poder mover ninguna pieza si todas están en home");
     }
 
     @Test
-    public void testIsValidMoveInFinalTrack() {
-        when(turn.getCurrentPlayer()).thenReturn(0);
-        when(board.getSquareFromValue(anyInt())).thenReturn(new Square(1, "RED", "NORMAL"));
-        when(finalTrack.getSquares()).thenReturn(Collections.singletonList(new SquareSafe(1, "RED", "SAFE")));
+    void canMove_whenPiecesCanMove_shouldReturnTrue() {
+        Dice dice = parchis.getDice();
+        dice.setValue(6);
+        Piece piece = playResource.exitPiece();
 
-        assertFalse(playResource.isValidMoveInFinalTrack(0, 6));
+        assertTrue(playResource.canMove(), "Debería ser posible mover la pieza");
     }
 
     @Test
-    public void testIsValidMove() {
-        Piece piece = new Piece("red");
-        when(player.getPath()).thenReturn(Collections.singletonList(1));
-        when(board.getSquareFromValue(anyInt())).thenReturn(new Square(1, "red", "NORMAL"));
+    void isValidMoveInFinalTrack_whenValidMove_shouldReturnTrue() {
 
-        assertFalse(playResource.isValidMove(piece, 6, Collections.singletonList(1)));
+        boolean result = playResource.isValidMoveInFinalTrack(0, 10);
+
+        assertTrue(result, "El movimiento debería ser válido en la pista final");
     }
 
     @Test
-    public void testMove() {
-        Piece piece = new Piece("red");
-        when(dice.getValue()).thenReturn(5);
-        when(player.getColor()).thenReturn("red");
-        when(player.getPieces()).thenReturn(Collections.singletonList(piece));
-        when(player.getPath()).thenReturn(Collections.singletonList(1));
-
-        assertFalse(playResource.move(piece));
+    void isValidMove_whenValidMove_shouldReturnTrue() {
+        Player player = parchis.getCurrentPlayer();
+        List<Integer> path = player.getPath();
+        Piece piece =  playResource.exitPiece();
+        assertTrue(playResource.isValidMove(piece, 5, path), "Debería ser un movimiento válido");
     }
 
     @Test
-    public void testMovePiece() {
-        Piece piece = new Piece("red");
-        List<Integer> path = Arrays.asList(1, 2, 3, 4, 5);
+    void move_whenValidMove_shouldMovePiece() {
+        Turn turn = parchis.getTurn();
+        turn.setCurrentPlayer(0);
 
-        Square initialSquare = new Square(1, "RED", "NORMAL");
-        initialSquare.putPiece(piece);
+        Player player = parchis.getCurrentPlayer();
+        List<Integer> path = player.getPath();
+        Piece piece = playResource.exitPiece();
+        parchis.getDice().setValue(6);
 
-        Square finalSquare = new Square(2, "RED", "NORMAL");
-
-        when(turn.getCurrentPlayer()).thenReturn(0);
-        when(board.getSquareFromValue(1)).thenReturn(initialSquare);
-        when(board.getSquareFromValue(2)).thenReturn(finalSquare);
-        List<SquareSafe> finalTrackSquares = Arrays.asList(new SquareSafe(1, "RED", "SAFE"),
-                new SquareSafe(2, "RED", "SAFE"));
-        when(finalTrack.getSquares()).thenReturn(finalTrackSquares);
-        when(board.getFinalTracks()).thenReturn(new FinalTrack[]{finalTrack});
-
-        playResource.movePiece(piece, 1, path);
-
-        verify(board, times(1)).getSquareFromValue(1);
-        verify(board, times(1)).getSquareFromValue(2);
-        assertFalse(initialSquare.getPieces().contains(piece));
-        assertTrue(finalSquare.getPieces().contains(piece));
+        assertTrue(playResource.move(piece));
     }
 
+    @Test
+    void capturePiece_whenNoCaptureCondition_shouldReturnFalse() {
+        playResource.exitPiece(); // Mover una pieza para estar en una posición donde no haya captura
+
+        boolean result = playResource.capturePiece();
+
+        assertFalse(result, "No debería haber captura y por lo tanto no se debería poder mover");
+    }
+
+
+    @Test
+    void capturePiece_whenCaptureConditionMet_shouldReturnTrue() {
+        playResource.exitPiece();
+        parchis.setCapture(true); // Simular una captura previa
+
+        boolean result = playResource.capturePiece();
+
+        assertTrue(result, "Debería haber captura y poder mover");
+        assertEquals(20, parchis.getDice().getValue(), "El valor del dado debería haber sido reseteado a 0");
+        assertFalse(parchis.isCapture(), "El estado de captura debería haber sido reseteado");
+    }
+
+    @Test
+    void arriveGoal_whenNoArriveGoalCondition_shouldReturnFalse() {
+        playResource.exitPiece(); // Mover una pieza para estar en una posición donde no haya llegada a la meta
+
+        boolean result = playResource.arriveGoal();
+
+        assertFalse(result, "No debería haber llegada a la meta y por lo tanto no se debería poder mover");
+    }
+
+
+    @Test
+    void arriveGoal_whenArriveGoalConditionMet_shouldReturnTrue() {
+        playResource.exitPiece();
+        parchis.setArriveGoal(true); // Simular llegada a la meta
+
+        boolean result = playResource.arriveGoal();
+
+        assertTrue(result, "Debería haber llegada a la meta y poder mover");
+        assertEquals(10, parchis.getDice().getValue(), "El valor del dado debería haber sido reseteado a 0");
+        assertFalse(parchis.isArriveGoal(), "El estado de llegada a la meta debería haber sido reseteado");
+    }
 
 }

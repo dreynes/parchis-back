@@ -20,4 +20,16 @@ public class Turn {
     public void nextTurn() {
         currentPlayer = (currentPlayer + 1) % numberOfPlayers;
     }
+
+    public void setCurrentPlayer(int currentPlayer) {
+        this.currentPlayer = currentPlayer;
+    }
+
+    public int getNumberOfPlayers() {
+        return numberOfPlayers;
+    }
+
+    public void setNumberOfPlayers(int numberOfPlayers) {
+        this.numberOfPlayers = numberOfPlayers;
+    }
 }
