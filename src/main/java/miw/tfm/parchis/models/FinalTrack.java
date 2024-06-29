@@ -18,7 +18,10 @@ public class FinalTrack {
         return squares;
     }
 
+
     public void setSquares(List<SquareSafe> squares) {
         this.squares = squares;
     }
+
+
 }

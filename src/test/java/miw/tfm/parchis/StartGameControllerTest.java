@@ -1,26 +1,42 @@
 package miw.tfm.parchis;
 
 import miw.tfm.parchis.controllers.StartGameController;
+import miw.tfm.parchis.models.Parchis;
+import miw.tfm.parchis.models.SessionState;
+import miw.tfm.parchis.services.StartGameResource;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
-import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
-@SpringBootTest
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+
 public class StartGameControllerTest {
 
-    @Autowired
+    @Mock
+    private StartGameResource startGameResource;
+
+    @Mock
+    private SessionState sessionState;
+
+    @InjectMocks
     private StartGameController startGameController;
 
+    @BeforeEach
+    public void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     @Test
-    public void testCreateGameReturnsOk() {
-
-        ResponseEntity<Map<String, Object>> response = startGameController.createGame();
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    public void testCreateGame() {
+        Parchis mockParchis = new Parchis();
+        when(startGameResource.createGame()).thenReturn(mockParchis);
+        ResponseEntity<Void> response = startGameController.createGame();
+        verify(startGameResource, times(1)).createGame();
+        verify(sessionState, times(1)).setParchis(mockParchis);
+        assertEquals(ResponseEntity.ok().build(), response);
     }
 }

@@ -18,10 +18,7 @@ public class Square {
         this.pieces = new ArrayList<>();
     }
 
-    public void putPiece(Piece piece){
-        this.pieces.add(piece);
 
-    }
     public boolean isEmpty(){
         return this.pieces.size()==0;
     }
@@ -59,5 +56,26 @@ public class Square {
 
     public int getPosition() {
         return this.value;
+    }
+    public boolean canPutPiece(){
+        return !this.hasBlockade();
+    }
+    public void putPiece(Piece piece){
+        piece.setPosition(this.getPosition());
+        this.pieces.add(piece);
+
+    }
+    public boolean hasBlockade() {
+         return this.getPieces().size()==2;
+    }
+
+    public boolean capturePiece(){
+       Piece piece = this.getPieces().get(0);
+       this.removePiece(piece);
+       return true;
+    }
+
+    public void removePiece(Piece piece) {
+        this.pieces.remove(piece);
     }
 }

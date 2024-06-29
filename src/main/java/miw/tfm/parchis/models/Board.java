@@ -1,4 +1,6 @@
 package miw.tfm.parchis.models;
+
+import java.util.Collections;
 import java.util.List;
 
 public class Board {
@@ -18,22 +20,18 @@ public class Board {
         for (int i = 0; i < 4; i++) {
             this.homes[i] = new Home(BoardConstants.COLORS.get(i));
             this.finalTracks[i] = new FinalTrack();
+            assignSquares(Collections.singletonList(BoardConstants.SQUARE_EXIT.get(i)), SquareExit.class, BoardConstants.COLORS.get(i), "SquareExit", this.circuit);
         }
-
-        assignSquares(BoardConstants.SQUARE_SAFE_VALUES, SquareSafe.class, "light-grey", "SquareSafe", this.board, this.circuit);
-        assignSquares(BoardConstants.SQUARE_EXIT_RED, SquareExit.class, "red", "SquareExit", this.board, this.circuit);
-        assignSquares(BoardConstants.SQUARE_EXIT_BLUE, SquareExit.class, "blue", "SquareExit", this.board, this.circuit);
-        assignSquares(BoardConstants.SQUARE_EXIT_YELLOW, SquareExit.class, "yellow", "SquareExit", this.board, this.circuit);
-        assignSquares(BoardConstants.SQUARE_EXIT_GREEN, SquareExit.class, "green", "SquareExit", this.board, this.circuit);
-        assignSquares(BoardConstants.SQUARE_FINAL_TRACK_VALUES_RED, SquareSafe.class, "red", "FinalTrack", this.board, this.finalTracks[0]);
-        assignSquares(BoardConstants.SQUARE_FINAL_TRACK_VALUES_BLUE, SquareSafe.class, "blue", "FinalTrack", this.board, this.finalTracks[1]);
-        assignSquares(BoardConstants.SQUARE_FINAL_TRACK_VALUES_YELLOW, SquareSafe.class, "yellow", "FinalTrack", this.board, this.finalTracks[2]);
-        assignSquares(BoardConstants.SQUARE_FINAL_TRACK_VALUES_GREEN, SquareSafe.class, "green", "FinalTrack", this.board, this.finalTracks[3]);
-        assignSquares(BoardConstants.SQUARE_HOME_VALUES_RED, Square.class, "red", "HomeSquare", this.board, this.homes[0]);
-        assignSquares(BoardConstants.SQUARE_HOME_VALUES_BLUE, Square.class, "blue", "HomeSquare", this.board, this.homes[1]);
-        assignSquares(BoardConstants.SQUARE_HOME_VALUES_YELLOW, Square.class, "yellow", "HomeSquare", this.board, this.homes[2]);
-        assignSquares(BoardConstants.SQUARE_HOME_VALUES_GREEN, Square.class, "green", "HomeSquare", this.board, this.homes[3]);
-        assignSquares(BoardConstants.SQUARE_BLACK_BORDER, Square.class, "black", "Border", this.board, null);
+        assignSquares(BoardConstants.SQUARE_CIRCUIT, Square.class, "white", "Square", this.circuit);
+        assignSquares(BoardConstants.SQUARE_SAFE_VALUES, SquareSafe.class, "light-grey", "SquareSafe", this.circuit);
+        assignSquares(BoardConstants.SQUARE_FINAL_TRACK_VALUES_RED, SquareSafe.class, "red", "FinalTrack",this.finalTracks[0]);
+        assignSquares(BoardConstants.SQUARE_FINAL_TRACK_VALUES_BLUE, SquareSafe.class, "blue", "FinalTrack", this.finalTracks[1]);
+        assignSquares(BoardConstants.SQUARE_FINAL_TRACK_VALUES_YELLOW, SquareSafe.class, "yellow", "FinalTrack",this.finalTracks[2]);
+        assignSquares(BoardConstants.SQUARE_FINAL_TRACK_VALUES_GREEN, SquareSafe.class, "green", "FinalTrack", this.finalTracks[3]);
+        assignSquares(BoardConstants.SQUARE_HOME_VALUES_RED, Square.class, "red", "HomeSquare", this.homes[0]);
+        assignSquares(BoardConstants.SQUARE_HOME_VALUES_BLUE, Square.class, "blue", "HomeSquare", this.homes[1]);
+        assignSquares(BoardConstants.SQUARE_HOME_VALUES_YELLOW, Square.class, "yellow", "HomeSquare", this.homes[2]);
+        assignSquares(BoardConstants.SQUARE_HOME_VALUES_GREEN, Square.class, "green", "HomeSquare", this.homes[3]);
 
         this.board[8][8] = new Goal(145);
 
@@ -44,21 +42,25 @@ public class Board {
         int index = value - 1;
         int col = index / nCols;
         int row = index % nRows;
-        return new Coordinate(row, col);
+        return new Coordinate(row,col);
+    }
+    public Square getSquareFromValue(int value) {
+        Coordinate coordinate = this.getPositionFromValue(value);
+        return this.board[coordinate.getRow()][coordinate.getCol()];
     }
 
-    private void assignSquares(List<Integer> values, Class<? extends Square> squareClass, String color, String type, Square[][] board, Object section) {
+    private void assignSquares(List<Integer> values, Class<? extends Square> squareClass, String color, String type, Object section) {
         for (Integer value : values) {
             Coordinate position = getPositionFromValue(value);
             try {
                 Square square = squareClass.getDeclaredConstructor(int.class, String.class, String.class).newInstance(value, color, type);
-                board[position.getRow()][position.getCol()] = square;
-                if (section instanceof Circuit) {
-                    ((Circuit) section).addSquare(square);
-                } else if (section instanceof Home) {
+                this.board[position.getRow()][position.getCol()] = square;
+                if (section instanceof Home) {
                     ((Home) section).addSquare(square);
                 } else if (section instanceof FinalTrack) {
                     ((FinalTrack) section).addSquare((SquareSafe) square);
+                } else if (section instanceof Circuit) {
+                    ((Circuit) section).getSquares().add((SquareSafe) square);
                 }
             } catch (Exception e) {
             }
@@ -70,9 +72,8 @@ public class Board {
         for (int j = 0; j < nCols; j++) {
             for (int i = 0; i < nRows; i++) {
                 if (board[i][j] == null) {
-                    Square square = new Square(count++, "white", "Square");
+                    Square square = new Square(count++, "black", "Border");
                     board[i][j] = square;
-                    this.circuit.addSquare(square);
                 } else {
                     count++;
                 }
@@ -96,17 +97,17 @@ public class Board {
         return finalTracks;
     }
 
-    public void setCircuit(Circuit circuit) {
+
+
+    public void movePieceHome(Piece piece) {
+        for(Home home : this.homes){
+            if(home.getColor().equals(piece.getColor())){
+                home.putPiece(piece);
+            }
+        }
     }
 
-    public void setBoard(Square[][] squares) {
+    public void putPieceInGoal(Piece piece) {
+        this.board[8][8].putPiece(piece);
     }
-
-    public void setHomes(Home[] homes) {
-    }
-
-    public void setFinalTracks(FinalTrack[] finalTracks) {
-    }
-
-
 }

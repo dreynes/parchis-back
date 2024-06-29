@@ -8,6 +8,7 @@ public class Player {
     private String name;
     private String color;
     private List<Piece> pieces;
+    private List<Integer> path;
     private boolean isTurn;
 
     public Player(String name, String color) {
@@ -16,9 +17,6 @@ public class Player {
         this.pieces = new ArrayList<>();
         this.isTurn = false;
 
-        for (int i = 0; i < 4; i++) {
-            this.pieces.add(new Piece(color));
-        }
     }
 
     public String getName() {
@@ -41,4 +39,11 @@ public class Player {
         isTurn = turn;
     }
 
+    public void setPath(List<Integer> path) {
+        this.path = path;
+    }
+
+    public List<Integer> getPath() {
+        return this.path;
+    }
 }

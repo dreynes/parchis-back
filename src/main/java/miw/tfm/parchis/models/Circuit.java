@@ -1,6 +1,5 @@
 package miw.tfm.parchis.models;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,15 +10,17 @@ public class Circuit {
         this.squares = new ArrayList<>();
     }
 
-    public void addSquare(Square square) {
-        this.squares.add(square);
+    public SquareExit getExitSquare(int turnValue) {
+        int squareValue = BoardConstants.SQUARE_EXIT.get(turnValue);
+        for (Square square : squares) {
+            if (square.getValue() == squareValue) {
+                return (SquareExit) square;
+            }
+        }
+        return null;
     }
 
     public List<Square> getSquares() {
         return squares;
-    }
-
-    public void setSquares(List<Square> squares) {
-        this.squares = squares;
     }
 }
