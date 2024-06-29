@@ -266,6 +266,54 @@ class PlayResourceTest {
     }
 
     @Test
+    public void testExitFull() {
+        playResource.exitPiece();
+        playResource.exitPiece();
+        parchis.getDice().setValue(5);
+        assertFalse(playResource.mustExitPiece());
+    }
+    @Test
+    public void canMove() {
+        Piece piece = playResource.exitPiece();
+        Piece piece2 = playResource.exitPiece();
+        Player player = parchis.getCurrentPlayer();
+        List<Integer> path = player.getPath();
+        playResource.movePiece(piece,17,path);
+        playResource.movePiece(piece2,17,path);
+        parchis.getTurn().setCurrentPlayer(3);
+        playResource.exitPiece();
+        playResource.exitPiece();
+        parchis.getDice().setValue(5);
+        assertFalse(playResource.canMove());
+    }
+
+    @Test
+    public void eatPieceTest() {
+        Piece piece = playResource.exitPiece();
+        Player player = parchis.getCurrentPlayer();
+        List<Integer> path = player.getPath();
+        playResource.movePiece(piece,2,path);
+        playResource.changeTurn();
+        Piece pieceBlue = playResource.exitPiece();
+        parchis.getDice().setValue(18);
+        assertTrue(playResource.move(pieceBlue));
+        assertTrue(parchis.isCapture());
+
+    }
+    @Test
+    public void testMustExitWithHomeEmpty() {
+        Piece piece = playResource.exitPiece();
+        Piece piece2 = playResource.exitPiece();
+        Player player = parchis.getCurrentPlayer();
+        List<Integer> path = player.getPath();
+        playResource.movePiece(piece,5,path);
+        playResource.movePiece(piece2,5,path);
+        playResource.exitPiece();
+        playResource.exitPiece();
+        parchis.getDice().setValue(5);
+        assertFalse(playResource.mustExitPiece());
+    }
+    @Test
     public void testMoveInFinalTrack() {
         Turn turn = parchis.getTurn();
         turn.setCurrentPlayer(0);
@@ -291,6 +339,21 @@ class PlayResourceTest {
         Square square = parchis.getBoard().getSquareFromValue(141);
         square.putPiece(piece);
         assertTrue(playResource.move(piece));
+    }
+
+    @Test
+    public void testMoveInFinalTrackArriveGoal() {
+        Turn turn = parchis.getTurn();
+        turn.setCurrentPlayer(0);
+
+        Player player = parchis.getCurrentPlayer();
+        List<Integer> path = player.getPath();
+        Piece piece = playResource.exitPiece();
+        parchis.getDice().setValue(4);
+        Square square = parchis.getBoard().getSquareFromValue(141);
+        square.putPiece(piece);
+        assertTrue(playResource.move(piece));
+        assertTrue(parchis.isArriveGoal());
     }
 
     @Test
