@@ -31,7 +31,7 @@ public class SecurityConfig {
     @Profile("!test")
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf.disable()) // Deshabilitar CSRF explícitamente
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
                         .anyRequest().authenticated()
@@ -45,15 +45,11 @@ public class SecurityConfig {
         return http.build();
     }
 
-
     @Bean
     @Profile("test")
     public SecurityFilterChain testSecurityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
-                );
+                .csrf(csrf -> csrf.disable()); // Deshabilitar CSRF explícitamente en entorno de prueba
 
         return http.build();
     }
