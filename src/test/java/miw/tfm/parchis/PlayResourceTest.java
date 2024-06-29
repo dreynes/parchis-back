@@ -4,11 +4,13 @@ import miw.tfm.parchis.models.*;
 import miw.tfm.parchis.services.PlayResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.ResponseEntity;
 
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 class PlayResourceTest {
 
@@ -141,14 +143,31 @@ class PlayResourceTest {
         Home home =  parchis.getBoard().getHomes()[turn.getCurrentPlayer()];
         Piece piece = home.getPieces().get(0);
         // Establecer un valor de dado que no permita un movimiento válido
-        parchis.getDice().setValue(3);
+        parchis.getDice().setValue(2);
 
         boolean result = playResource.move(piece);
 
-        assertFalse(result, "No debería ser posible mover la pieza con el dado dado el valor establecido");
+        assertFalse(result, "No debería ser posible mover la pieza esta en casa");
         assertTrue(home.getPieces().contains(piece), "La pieza debería permanecer en home si el movimiento no fue válido");
     }
 
+    @Test
+    void move_whenInvalidMove_shouldReturnFalseColorsNotMatch() {
+        Turn turn = parchis.getTurn();
+        turn.setCurrentPlayer(0);
+
+        Player player = parchis.getCurrentPlayer();
+        List<Integer> path = player.getPath();
+
+        Home home =  parchis.getBoard().getHomes()[turn.getCurrentPlayer()];
+        Piece piece = home.getPieces().get(0);
+        piece.setColor("blue");
+        parchis.getDice().setValue(4);
+
+        boolean result = playResource.move(piece);
+
+        assertFalse(result, "No debería ser posible mover la pieza es de otro color");
+    }
 
     @Test
     void canMove_whenAllPiecesInHome_shouldReturnFalse() {
@@ -178,6 +197,13 @@ class PlayResourceTest {
         boolean result = playResource.isValidMoveInFinalTrack(0, 10);
 
         assertTrue(result, "El movimiento debería ser válido en la pista final");
+    }
+    @Test
+    void isValidMoveInFinalTrack_whenValidMove_shouldReturnFalse() {
+
+        boolean result = playResource.isValidMoveInFinalTrack(4, 20);
+
+        assertFalse(result, "El movimiento no debería ser válido en la pista final");
     }
 
     @Test
@@ -210,6 +236,62 @@ class PlayResourceTest {
         assertFalse(result, "No debería haber captura y por lo tanto no se debería poder mover");
     }
 
+
+    @Test
+    public void testMoveCircuitToFinalTrack() {
+        Turn turn = parchis.getTurn();
+        turn.setCurrentPlayer(0);
+
+        Player player = parchis.getCurrentPlayer();
+        List<Integer> path = player.getPath();
+        Piece piece = playResource.exitPiece();
+        parchis.getDice().setValue(6);
+        Square square = parchis.getBoard().getSquareFromValue(155);
+        square.putPiece(piece);
+        assertTrue(playResource.move(piece));
+    }
+
+    @Test
+    public void testMoveInFinalTrackWithNotValidNumber() {
+        Turn turn = parchis.getTurn();
+        turn.setCurrentPlayer(0);
+
+        Player player = parchis.getCurrentPlayer();
+        List<Integer> path = player.getPath();
+        Piece piece = playResource.exitPiece();
+        parchis.getDice().setValue(36);
+        Square square = parchis.getBoard().getSquareFromValue(155);
+        square.putPiece(piece);
+        assertFalse(playResource.move(piece));
+    }
+
+    @Test
+    public void testMoveInFinalTrack() {
+        Turn turn = parchis.getTurn();
+        turn.setCurrentPlayer(0);
+
+        Player player = parchis.getCurrentPlayer();
+        List<Integer> path = player.getPath();
+        Piece piece = playResource.exitPiece();
+        parchis.getDice().setValue(2);
+        Square square = parchis.getBoard().getSquareFromValue(141);
+        square.putPiece(piece);
+        assertTrue(playResource.move(piece));
+    }
+
+    @Test
+    public void testMoveInFinalTrackWithBound() {
+        Turn turn = parchis.getTurn();
+        turn.setCurrentPlayer(0);
+
+        Player player = parchis.getCurrentPlayer();
+        List<Integer> path = player.getPath();
+        Piece piece = playResource.exitPiece();
+        parchis.getDice().setValue(10);
+        Square square = parchis.getBoard().getSquareFromValue(141);
+        square.putPiece(piece);
+        assertTrue(playResource.move(piece));
+    }
 
     @Test
     void capturePiece_whenCaptureConditionMet_shouldReturnTrue() {

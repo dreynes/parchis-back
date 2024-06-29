@@ -25,6 +25,9 @@ public class Piece {
     public void setPosition(int position) {
         this.position = position;
     }
+    public void setColor(String color) {
+        this.color = color;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -33,6 +36,7 @@ public class Piece {
         Piece piece = (Piece) o;
         return position == piece.position && Objects.equals(color, piece.color);
     }
+
 
     @Override
     public int hashCode() {
