@@ -33,7 +33,7 @@ public class PlayResource {
         Circuit circuit = this.sessionState.getParchis().getBoard().getCircuit();
         SquareExit squareExit = circuit.getExitSquare(turnValue);
         if (squareExit.isFull())
-            if (squareExit.getPieces().get(0).getColor().equals(squareExit.getPieces().get(0).getColor()))
+            if (squareExit.getPieces().get(0).getColor().equals(squareExit.getPieces().get(1).getColor()))
                 return false;
         boolean res = home.getPieces().size() > 0 && diceValue == 5;
         if (res) {
