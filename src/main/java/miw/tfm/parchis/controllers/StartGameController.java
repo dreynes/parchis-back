@@ -22,9 +22,10 @@ public class StartGameController {
     private final GameState gameState;
 
     @Autowired
-    public StartGameController(GameState gameState, StartGameResource startGameResourc, SaveResource saveResource) {
+    public StartGameController(GameState gameState, StartGameResource startGameResource, SaveResource saveResource) {
         this.gameState = gameState;
         this.startGameResource = startGameResource;
+        this.saveResource = saveResource;
     }
 
 

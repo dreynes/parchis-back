@@ -50,6 +50,10 @@ public class Board {
         return this.board[coordinate.getRow()][coordinate.getCol()];
     }
 
+    public void setSquareFromValue(Square square) {
+        Coordinate coordinate = this.getPositionFromValue(square.getValue());
+        this.board[coordinate.getRow()][coordinate.getCol()] = square;
+    }
     private void assignSquares(List<Integer> values, Class<? extends Square> squareClass, String color, String type, Object section) {
         for (Integer value : values) {
             Coordinate position = getPositionFromValue(value);

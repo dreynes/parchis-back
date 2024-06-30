@@ -52,6 +52,7 @@ public class PlayResource {
         Circuit circuit = this.gameState.getParchis().getBoard().getCircuit();
         SquareExit squareExit = circuit.getExitSquare(turnValue);
         squareExit.putPiece(piece);
+
         return piece;
     }
 
@@ -170,6 +171,7 @@ public class PlayResource {
         } else {
             Square squareInitial = this.gameState.getParchis().getBoard().getSquareFromValue(path.get(positionInitial));
             squareInitial.removePiece(piece);
+            this.gameState.getParchis().getBoard().setSquareFromValue(squareInitial);
             if (positionInitial + diceValue >= path.size()) {
                 int extra = positionInitial + diceValue - path.size();
                 moveInFinalTrack(piece, 0, extra);
@@ -187,6 +189,7 @@ public class PlayResource {
                 }
                 player.getPieces().remove(piece);
                 square.putPiece(piece);
+                this.gameState.getParchis().getBoard().setSquareFromValue(square);
                 player.getPieces().add(piece);
             }
         }
@@ -205,6 +208,7 @@ public class PlayResource {
             player.getPieces().remove(piece);
             squares.get(initialPosition).removePiece(piece);
             this.gameState.getParchis().putPieceGoal(piece);
+            this.gameState.getParchis().getBoard().setSquareFromValue(squares.get(initialPosition));
         } else {
             if (finalPosition >= finalTrackSize) {
                 finalPosition = finalTrackSize - (finalPosition - finalTrackSize);
@@ -212,6 +216,8 @@ public class PlayResource {
             player.getPieces().remove(piece);
             squares.get(initialPosition).removePiece(piece);
             squares.get(finalPosition).putPiece(piece);
+            this.gameState.getParchis().getBoard().setSquareFromValue(squares.get(initialPosition));
+            this.gameState.getParchis().getBoard().setSquareFromValue(squares.get(finalPosition));
             player.getPieces().add(piece);
         }
     }
