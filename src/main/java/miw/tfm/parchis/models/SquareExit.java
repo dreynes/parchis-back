@@ -11,7 +11,6 @@ public class SquareExit extends SquareSafe {
         if(this.getPieces().size()<=1) {
             piece.setPosition(this.getPosition());
             this.getPieces().add(piece);
-            System.out.println("ficha puesta en la casilla exit posicion: " + piece.getPosition());
         }
     }
     public boolean hasBlockade() {

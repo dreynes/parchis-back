@@ -12,7 +12,7 @@ public class StartGameResourceTest {
 
     @Test
     public void testCreateGame() {
-        Parchis parchis = startGameResource.createGame();
+        Parchis parchis = startGameResource.createGame(4);
         Board board = parchis.getBoard();
         assertThat(board).isNotNull();
         assertThat(board.getBoard()).isNotNull().isNotEmpty();

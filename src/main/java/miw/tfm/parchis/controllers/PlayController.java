@@ -70,10 +70,6 @@ public class PlayController {
         Board board = parchis.getBoard();
         Map<String, Object> response = new HashMap<>();
         response.put("board", board.getBoard());
-        response.put("goal", board.getGoal());
-        response.put("circuit", board.getCircuit().getSquares());
-        response.put("homes", Arrays.stream(board.getHomes()).map(Home::getSquares).collect(Collectors.toList()));
-        response.put("finalTracks", Arrays.stream(board.getFinalTracks()).map(FinalTrack::getSquares).collect(Collectors.toList()));
         return ResponseEntity.ok(response);
     }
 }

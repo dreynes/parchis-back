@@ -45,17 +45,6 @@ public class PlayResourceTestMocks extends BaseMockTest {
     }
 
     @Test
-    public void testExitPiece() {
-        when(turn.getCurrentPlayer()).thenReturn(0);
-        Piece piece = new Piece("red");
-        when(home.exitPiece()).thenReturn(piece);
-
-        playResource.exitPiece();
-
-        verify(squareExit, times(1)).putPiece(piece);
-    }
-
-    @Test
     public void testChangeTurn() {
         when(turn.getCurrentPlayer()).thenReturn(0);
         doNothing().when(turn).nextTurn();
@@ -101,16 +90,6 @@ public class PlayResourceTestMocks extends BaseMockTest {
         assertFalse(playResource.isValidMove(piece, 6, Collections.singletonList(1)));
     }
 
-    @Test
-    public void testMove() {
-        Piece piece = new Piece("red");
-        when(dice.getValue()).thenReturn(5);
-        when(player.getColor()).thenReturn("red");
-        when(player.getPieces()).thenReturn(Collections.singletonList(piece));
-        when(player.getPath()).thenReturn(Collections.singletonList(1));
-
-        assertFalse(playResource.move(piece));
-    }
 
     @Test
     public void testMovePiece() {

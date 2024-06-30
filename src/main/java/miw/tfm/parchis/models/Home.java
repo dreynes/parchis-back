@@ -28,29 +28,28 @@ public class Home {
         this.squares = squares;
     }
 
-    public void putPiece(Piece piece) {
+    public Square putPiece(Piece piece) {
         for (Square square : squares) {
             if (square.isEmpty()) {
                 square.putPiece(piece);
                 piece.setPosition(0);
                 this.pieces.add(piece);
-                return;
+                return square;
             }
 
         }
+        return null;
     }
 
-    public Piece exitPiece() {
-        Piece piece = null;
-        for (Square square : squares) {
+    public Square exitPiece() {
+         for (Square square : squares) {
             if (!square.isEmpty()) {
-                piece = square.getPieces().get(0);
-                square.getPieces().remove(piece);
+                Piece piece = square.getPieces().get(0);
                 this.pieces.remove(piece);
-                return piece;
+                return square;
             }
         }
-        return piece;
+        return null;
     }
 
     public boolean isEmpty(){

@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class StartGameResource {
-    public Parchis createGame() {
-        Parchis parchis = new Parchis();
+    public Parchis createGame(int numOfPlayers) {
+        Parchis parchis = new Parchis(numOfPlayers);
         return parchis;
     }
 }

@@ -30,8 +30,8 @@ public class StartGameController {
 
 
     @PostMapping("/create/initializeBoard")
-    public ResponseEntity<Void> createGame() {
-        Parchis parchis = startGameResource.createGame();
+    public ResponseEntity<Void> createGame(@PathParam("numOfPlayers")  int numOfPlayers) {
+        Parchis parchis = startGameResource.createGame(numOfPlayers);
         gameState.setParchis(parchis);
         return ResponseEntity.ok().build();
     }

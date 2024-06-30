@@ -48,10 +48,17 @@ public class PlayResource {
     public Piece exitPiece() {
         int turnValue = this.gameState.getParchis().getTurn().getCurrentPlayer();
         Home home = this.gameState.getParchis().getBoard().getHomes()[turnValue];
-        Piece piece = home.exitPiece();
+        Square square = home.exitPiece();
         Circuit circuit = this.gameState.getParchis().getBoard().getCircuit();
         SquareExit squareExit = circuit.getExitSquare(turnValue);
-        squareExit.putPiece(piece);
+        Piece piece = square.getPieces().get(0);
+        Player player = this.gameState.getParchis().getCurrentPlayer();
+        player.getPieces().remove(piece);
+        squareExit.putPiece(square.getPieces().get(0));
+        square.getPieces().remove(piece);
+        player.getPieces().add(piece);
+        this.gameState.getParchis().getBoard().setSquareFromValue(squareExit);
+        this.gameState.getParchis().getBoard().setSquareFromValue(square);
 
         return piece;
     }
@@ -94,9 +101,13 @@ public class PlayResource {
         FinalTrack finalTrack = this.gameState.getParchis().getBoard().getFinalTracks()[turnValue];
         List<SquareSafe> squares = finalTrack.getSquares();
         int finalTrackSize = squares.size();
+
         if (initialPosition != 0) {
             Square square = this.gameState.getParchis().getBoard().getSquareFromValue(initialPosition);
             initialPosition = squares.indexOf(square);
+            if(initialPosition==-1){
+                return false;
+            }
         }
         int finalPosition = initialPosition + diceValue;
         if (finalPosition >= finalTrackSize) {
@@ -111,11 +122,9 @@ public class PlayResource {
     public Boolean isValidMove(Piece piece, int diceValue, List<Integer> path) {
         int positionInitial = path.indexOf(piece.getPosition());
         if (piece.getPosition() == 0){
-            System.out.println("la pieza tiene posicion 0 esta en casa");
             return false;
         }
         if (positionInitial == -1) {
-            System.out.println("la pieza tiene posicion -1 esta en el finalTrack");
             return isValidMoveInFinalTrack(piece.getPosition(), diceValue);
         }
         if (positionInitial + diceValue >= path.size()) {
@@ -129,13 +138,11 @@ public class PlayResource {
             int squareValue = path.get(positionInitial + i);
             Square square = this.gameState.getParchis().getBoard().getSquareFromValue(squareValue);
             if (square.hasBlockade()) {
-                System.out.println("hay bloqueos");
                 return false;
             }
         }
         Square square = this.gameState.getParchis().getBoard().getSquareFromValue(positionInitial + diceValue);
         if (!square.canPutPiece()) {
-            System.out.println("casilla destino llena");
             return false;
         }
         return true;
@@ -144,6 +151,7 @@ public class PlayResource {
     public Boolean move(Piece piece) {
         int diceValue = this.gameState.getParchis().getDice().getValue();
         Player player = this.gameState.getParchis().getCurrentPlayer();
+        player.getPieces().remove(piece);
         List<Integer> path = player.getPath();
         if (!player.getColor().equals(piece.getColor())) {
             return false;
@@ -153,6 +161,7 @@ public class PlayResource {
         } else {
             movePiece(piece, diceValue, path);
             this.gameState.getParchis().getDice().setValue(0);
+            player.getPieces().add(piece);
             return true;
         }
     }

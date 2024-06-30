@@ -12,12 +12,12 @@ public class Parchis {
     private boolean isCapture;
     private boolean isArriveGoal;
 
-    public Parchis() {
+    public Parchis(int numOfPlayers) {
         this.board = new Board();
-        this.turn = new Turn(4);
+        this.turn = new Turn(numOfPlayers);
         this.dice = new Dice();
-        this.players = new Player[4];
-        for (int i = 0; i < 4; i++) {
+        this.players = new Player[numOfPlayers];
+        for (int i = 0; i < numOfPlayers; i++) {
             this.players[i] = new Player("jugador" + i, BoardConstants.COLORS.get(i));
             this.players[i].setPath(BoardConstants.PATHS.get(i));
         }
@@ -34,7 +34,7 @@ public class Parchis {
 
 
     public void setPutPiecesInitialPosition() {
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < players.length; i++) {
             for (int j = 0; j < 4; j++) {
                 Piece piece = new Piece(this.board.getHomes()[i].getColor());
                 this.players[i].getPieces().add(piece);

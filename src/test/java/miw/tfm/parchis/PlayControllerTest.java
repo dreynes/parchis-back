@@ -117,9 +117,6 @@ public class PlayControllerTest {
         ResponseEntity<Map<String, Object>> response = playController.updateBoard();
         Map<String, Object> responseBody = response.getBody();
 
-        assertEquals(5, responseBody.size());
-        assertEquals(0, ((List<?>) responseBody.get("circuit")).size());
-        assertEquals(0, ((List<?>) ((List<?>) responseBody.get("homes")).get(0)).size());
-        assertEquals(0, ((List<?>) ((List<?>) responseBody.get("finalTracks")).get(0)).size());
+        assertEquals(1, responseBody.size());
     }
 }

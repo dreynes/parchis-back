@@ -32,10 +32,10 @@ public class StartGameControllerTest {
 
     @Test
     public void testCreateGame() {
-        Parchis mockParchis = new Parchis();
-        when(startGameResource.createGame()).thenReturn(mockParchis);
-        ResponseEntity<Void> response = startGameController.createGame();
-        verify(startGameResource, times(1)).createGame();
+        Parchis mockParchis = new Parchis(4);
+        when(startGameResource.createGame(4)).thenReturn(mockParchis);
+        ResponseEntity<Void> response = startGameController.createGame(4);
+        verify(startGameResource, times(1)).createGame(4);
         verify(gameState, times(1)).setParchis(mockParchis);
         assertEquals(ResponseEntity.ok().build(), response);
     }

@@ -18,7 +18,7 @@ class PlayResourceTest {
     @BeforeEach
     void setUp() {
         // Inicializar el estado del juego (Parchis)
-        parchis = new Parchis();
+        parchis = new Parchis(4);
         GameState gameState = new GameState();
         gameState.setParchis(parchis);
         playResource = new PlayResource(gameState);

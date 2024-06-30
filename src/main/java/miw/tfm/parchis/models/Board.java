@@ -107,7 +107,8 @@ public class Board {
     public void movePieceHome(Piece piece) {
         for(Home home : this.homes){
             if(home.getColor().equals(piece.getColor())){
-                home.putPiece(piece);
+                Square square = home.putPiece(piece);
+                this.setSquareFromValue(square);
             }
         }
     }
