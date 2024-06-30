@@ -1,7 +1,7 @@
 package miw.tfm.parchis;
 
 import miw.tfm.parchis.controllers.AuthenticationController;
-import miw.tfm.parchis.models.SessionState;
+import miw.tfm.parchis.models.GameState;
 import miw.tfm.parchis.models.UserModel;
 import miw.tfm.parchis.mongo.dto.UserEntity;
 import miw.tfm.parchis.security.JwtUtil;
@@ -30,7 +30,7 @@ public class AuthenticationControllerTest {
     private JwtUtil jwtUtil;
 
     @Mock
-    private SessionState sessionState;
+    private GameState gameState;
 
     @InjectMocks
     private AuthenticationController authenticationController;

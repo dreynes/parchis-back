@@ -9,6 +9,12 @@ public class SquareSafe extends Square {
         return this.getPieces().size() == 2;
     }
 
+    public void putPiece(Piece piece){
+        if(this.getPieces().size()<=1) {
+            piece.setPosition(this.getPosition());
+            this.getPieces().add(piece);
+        }
+    }
     public boolean canPutPiece() {
         return !this.isFull();
     }

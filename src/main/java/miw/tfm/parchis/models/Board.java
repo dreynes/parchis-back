@@ -7,7 +7,7 @@ public class Board {
 
     private int nCols = 17;
     private int nRows = 17;
-
+    private Goal goal;
     private Square[][] board = new Square[nRows][nCols];
     private Circuit circuit;
     private Home[] homes;
@@ -33,7 +33,8 @@ public class Board {
         assignSquares(BoardConstants.SQUARE_HOME_VALUES_YELLOW, Square.class, "yellow", "HomeSquare", this.homes[2]);
         assignSquares(BoardConstants.SQUARE_HOME_VALUES_GREEN, Square.class, "green", "HomeSquare", this.homes[3]);
 
-        this.board[8][8] = new Goal(145);
+        this.goal = new Goal(145);
+        this.board[8][8] = this.goal;
 
         fillRemainingSquares(this.board);
     }
@@ -105,6 +106,14 @@ public class Board {
                 home.putPiece(piece);
             }
         }
+    }
+
+    public Goal getGoal() {
+        return goal;
+    }
+
+    public void setGoal(Goal goal) {
+        this.goal = goal;
     }
 
     public void putPieceInGoal(Piece piece) {

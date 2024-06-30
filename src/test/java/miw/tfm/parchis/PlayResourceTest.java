@@ -4,13 +4,11 @@ import miw.tfm.parchis.models.*;
 import miw.tfm.parchis.services.PlayResource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.ResponseEntity;
 
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 class PlayResourceTest {
 
@@ -21,9 +19,9 @@ class PlayResourceTest {
     void setUp() {
         // Inicializar el estado del juego (Parchis)
         parchis = new Parchis();
-        SessionState sessionState = new SessionState();
-        sessionState.setParchis(parchis);
-        playResource = new PlayResource(sessionState);
+        GameState gameState = new GameState();
+        gameState.setParchis(parchis);
+        playResource = new PlayResource(gameState);
     }
 
 

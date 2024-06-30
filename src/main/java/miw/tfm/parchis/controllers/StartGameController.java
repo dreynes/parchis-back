@@ -1,12 +1,14 @@
 package miw.tfm.parchis.controllers;
 
+import jakarta.websocket.server.PathParam;
 import miw.tfm.parchis.models.*;
+import miw.tfm.parchis.services.SaveResource;
 import miw.tfm.parchis.services.StartGameResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -14,12 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class StartGameController {
     @Autowired
     private StartGameResource startGameResource;
+    @Autowired
+    private SaveResource saveResource;
 
-    private final SessionState sessionState;
+    private final GameState gameState;
 
     @Autowired
-    public StartGameController(SessionState sessionState, StartGameResource startGameResource) {
-        this.sessionState = sessionState;
+    public StartGameController(GameState gameState, StartGameResource startGameResourc, SaveResource saveResource) {
+        this.gameState = gameState;
         this.startGameResource = startGameResource;
     }
 
@@ -27,7 +31,18 @@ public class StartGameController {
     @PostMapping("/create/initializeBoard")
     public ResponseEntity<Void> createGame() {
         Parchis parchis = startGameResource.createGame();
-        sessionState.setParchis(parchis);
+        gameState.setParchis(parchis);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/open")
+    public ResponseEntity<List<String>> open() {
+        return ResponseEntity.ok(saveResource.findGamesByUser(gameState.getUser().getUsername()));
+    }
+    @PostMapping("/openGame")
+    public ResponseEntity<Void> openGame(@PathParam("gameName") String gameName) {
+        List<GameState> gameStates = saveResource.findGamesByName(gameName);
+        gameState.setParchis(gameStates.get(0).getParchis());
         return ResponseEntity.ok().build();
     }
 

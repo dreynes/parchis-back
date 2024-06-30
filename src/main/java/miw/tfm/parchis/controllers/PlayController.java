@@ -15,13 +15,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/game/play")
 public class PlayController {
 
-    private final SessionState sessionState;
+    private final GameState gameState;
 
     private PlayResource playResource;
 
     @Autowired
-    public PlayController(SessionState sessionState, PlayResource playResource) {
-        this.sessionState = sessionState;
+    public PlayController(GameState gameState, PlayResource playResource) {
+        this.gameState = gameState;
         this.playResource = playResource;
     }
     @GetMapping("/rollDice")
@@ -40,6 +40,10 @@ public class PlayController {
     @GetMapping("/changeTurn")
     public ResponseEntity<Color> changeTurn() {
         return ResponseEntity.ok(playResource.changeTurn());
+    }
+    @GetMapping("/getTurn")
+    public ResponseEntity<Color> getTurn() {
+        return ResponseEntity.ok(playResource.getTurn());
     }
     @GetMapping("/canMove")
     public ResponseEntity<Boolean> canMove() {
@@ -62,10 +66,11 @@ public class PlayController {
 
     @GetMapping("/updateBoard")
     public ResponseEntity<Map<String, Object>> updateBoard(){
-        Parchis parchis = this.sessionState.getParchis();
+        Parchis parchis = this.gameState.getParchis();
         Board board = parchis.getBoard();
         Map<String, Object> response = new HashMap<>();
         response.put("board", board.getBoard());
+        response.put("goal", board.getGoal());
         response.put("circuit", board.getCircuit().getSquares());
         response.put("homes", Arrays.stream(board.getHomes()).map(Home::getSquares).collect(Collectors.toList()));
         response.put("finalTracks", Arrays.stream(board.getFinalTracks()).map(FinalTrack::getSquares).collect(Collectors.toList()));

@@ -10,15 +10,15 @@ import java.util.List;
 public class PlayResource {
 
 
-    private final SessionState sessionState;
+    private final GameState gameState;
 
     @Autowired
-    public PlayResource(SessionState sessionState) {
-        this.sessionState = sessionState;
+    public PlayResource(GameState gameState) {
+        this.gameState = gameState;
     }
 
     public Integer rollDice() {
-        Dice dice = sessionState.getParchis().getDice();
+        Dice dice = gameState.getParchis().getDice();
         if (dice.getValue() == 0)
             return dice.roll();
         else {
@@ -27,68 +27,74 @@ public class PlayResource {
     }
 
     public boolean mustExitPiece() {
-        int turnValue = this.sessionState.getParchis().getTurn().getCurrentPlayer();
-        Home home = this.sessionState.getParchis().getBoard().getHomes()[turnValue];
-        int diceValue = this.sessionState.getParchis().getDice().getValue();
-        Circuit circuit = this.sessionState.getParchis().getBoard().getCircuit();
+        int turnValue = this.gameState.getParchis().getTurn().getCurrentPlayer();
+        Home home = this.gameState.getParchis().getBoard().getHomes()[turnValue];
+        int diceValue = this.gameState.getParchis().getDice().getValue();
+        Circuit circuit = this.gameState.getParchis().getBoard().getCircuit();
         SquareExit squareExit = circuit.getExitSquare(turnValue);
-        if (squareExit.isFull())
-            if (squareExit.getPieces().get(0).getColor().equals(squareExit.getPieces().get(1).getColor()))
-                return false;
+        if (squareExit.isFull()) {
+            if (squareExit.getPieces().get(0).getColor().equals(squareExit.getPieces().get(1).getColor())){
+                  return false;
+            }
+        }
         boolean res = home.getPieces().size() > 0 && diceValue == 5;
         if (res) {
-            this.sessionState.getParchis().getDice().setValue(0);
+            this.gameState.getParchis().getDice().setValue(0);
         }
         return res;
     }
 
 
     public Piece exitPiece() {
-        int turnValue = this.sessionState.getParchis().getTurn().getCurrentPlayer();
-        Home home = this.sessionState.getParchis().getBoard().getHomes()[turnValue];
+        int turnValue = this.gameState.getParchis().getTurn().getCurrentPlayer();
+        Home home = this.gameState.getParchis().getBoard().getHomes()[turnValue];
         Piece piece = home.exitPiece();
-        Circuit circuit = this.sessionState.getParchis().getBoard().getCircuit();
+        Circuit circuit = this.gameState.getParchis().getBoard().getCircuit();
         SquareExit squareExit = circuit.getExitSquare(turnValue);
         squareExit.putPiece(piece);
         return piece;
     }
 
     public Color changeTurn() {
-        Turn turn = this.sessionState.getParchis().getTurn();
-        this.sessionState.getParchis().getDice().setValue(0);
+        Turn turn = this.gameState.getParchis().getTurn();
+        this.gameState.getParchis().getDice().setValue(0);
         turn.nextTurn();
+        return Color.values()[turn.getCurrentPlayer()];
+    }
+    public Color getTurn() {
+        Turn turn = this.gameState.getParchis().getTurn();
         return Color.values()[turn.getCurrentPlayer()];
     }
 
     public boolean allPiecesInHome() {
-        int turnValue = this.sessionState.getParchis().getTurn().getCurrentPlayer();
-        Home home = this.sessionState.getParchis().getBoard().getHomes()[turnValue];
+        int turnValue = this.gameState.getParchis().getTurn().getCurrentPlayer();
+        Home home = this.gameState.getParchis().getBoard().getHomes()[turnValue];
         return home.isFull();
     }
 
     public Boolean canMove() {
-        int diceValue = this.sessionState.getParchis().getDice().getValue();
+        int diceValue = this.gameState.getParchis().getDice().getValue();
         if (allPiecesInHome()) {
-            this.sessionState.getParchis().getDice().setValue(0);
+            this.gameState.getParchis().getDice().setValue(0);
             return false;
         }
-        Player player = this.sessionState.getParchis().getCurrentPlayer();
+        Player player = this.gameState.getParchis().getCurrentPlayer();
         List<Integer> path = player.getPath();
         for (Piece piece : player.getPieces()) {
             if (isValidMove(piece, diceValue, path))
                 return true;
         }
-        this.sessionState.getParchis().getDice().setValue(0);
+        this.gameState.getParchis().getDice().setValue(0);
         return false;
     }
 
     public Boolean isValidMoveInFinalTrack(int initialPosition, int diceValue) {
-        int turnValue = this.sessionState.getParchis().getTurn().getCurrentPlayer();
-        FinalTrack finalTrack = this.sessionState.getParchis().getBoard().getFinalTracks()[turnValue];
+        int turnValue = this.gameState.getParchis().getTurn().getCurrentPlayer();
+        FinalTrack finalTrack = this.gameState.getParchis().getBoard().getFinalTracks()[turnValue];
         List<SquareSafe> squares = finalTrack.getSquares();
         int finalTrackSize = squares.size();
         if (initialPosition != 0) {
-            Square square = this.sessionState.getParchis().getBoard().getSquareFromValue(initialPosition);
+            Square square = this.gameState.getParchis().getBoard().getSquareFromValue(initialPosition);
             initialPosition = squares.indexOf(square);
         }
         int finalPosition = initialPosition + diceValue;
@@ -120,13 +126,13 @@ public class PlayResource {
         }
         for (int i = 1; i <= diceValue; i++) {
             int squareValue = path.get(positionInitial + i);
-            Square square = this.sessionState.getParchis().getBoard().getSquareFromValue(squareValue);
+            Square square = this.gameState.getParchis().getBoard().getSquareFromValue(squareValue);
             if (square.hasBlockade()) {
                 System.out.println("hay bloqueos");
                 return false;
             }
         }
-        Square square = this.sessionState.getParchis().getBoard().getSquareFromValue(positionInitial + diceValue);
+        Square square = this.gameState.getParchis().getBoard().getSquareFromValue(positionInitial + diceValue);
         if (!square.canPutPiece()) {
             System.out.println("casilla destino llena");
             return false;
@@ -135,48 +141,47 @@ public class PlayResource {
     }
 
     public Boolean move(Piece piece) {
-        int diceValue = this.sessionState.getParchis().getDice().getValue();
-        Player player = this.sessionState.getParchis().getCurrentPlayer();
+        int diceValue = this.gameState.getParchis().getDice().getValue();
+        Player player = this.gameState.getParchis().getCurrentPlayer();
         List<Integer> path = player.getPath();
         if (!player.getColor().equals(piece.getColor())) {
-            System.out.println("no coinciden los colores");
             return false;
         }
         if (!isValidMove(piece, diceValue, path)) {
             return false;
         } else {
             movePiece(piece, diceValue, path);
-            this.sessionState.getParchis().getDice().setValue(0);
+            this.gameState.getParchis().getDice().setValue(0);
             return true;
         }
     }
 
 
     public void movePiece(Piece piece, int diceValue, List<Integer> path) {
-        Player player = this.sessionState.getParchis().getCurrentPlayer();
-        this.sessionState.getParchis().getCurrentPlayer();
+        Player player = this.gameState.getParchis().getCurrentPlayer();
+        this.gameState.getParchis().getCurrentPlayer();
         int positionInitial = path.indexOf(piece.getPosition());
         if (positionInitial == -1) {
-            FinalTrack finalTrack = this.sessionState.getParchis().getBoard().getFinalTracks()[this.sessionState.getParchis().getTurn().getCurrentPlayer()];
+            FinalTrack finalTrack = this.gameState.getParchis().getBoard().getFinalTracks()[this.gameState.getParchis().getTurn().getCurrentPlayer()];
             List<SquareSafe> squares = finalTrack.getSquares();
-            Square square = this.sessionState.getParchis().getBoard().getSquareFromValue(piece.getPosition());
+            Square square = this.gameState.getParchis().getBoard().getSquareFromValue(piece.getPosition());
             int initialPosition = squares.indexOf(square);
             moveInFinalTrack(piece, initialPosition, diceValue);
         } else {
-            Square squareInitial = this.sessionState.getParchis().getBoard().getSquareFromValue(path.get(positionInitial));
+            Square squareInitial = this.gameState.getParchis().getBoard().getSquareFromValue(path.get(positionInitial));
             squareInitial.removePiece(piece);
             if (positionInitial + diceValue >= path.size()) {
                 int extra = positionInitial + diceValue - path.size();
                 moveInFinalTrack(piece, 0, extra);
             } else {
                 int positionFinal = positionInitial + diceValue;
-                Square square = this.sessionState.getParchis().getBoard().getSquareFromValue(path.get(positionFinal));
+                Square square = this.gameState.getParchis().getBoard().getSquareFromValue(path.get(positionFinal));
                 if (square.getPieces().size() == 1) {
                     Piece pieceToEat = square.getPieces().get(0);
                     if (!pieceToEat.getColor().equals(piece.getColor())) {
                         if (square.capturePiece()) {
-                            this.sessionState.getParchis().setCapture(true);
-                            this.sessionState.getParchis().movePieceHome(pieceToEat);
+                            this.gameState.getParchis().setCapture(true);
+                            this.gameState.getParchis().movePieceHome(pieceToEat);
                         }
                     }
                 }
@@ -189,9 +194,9 @@ public class PlayResource {
 
 
     private void moveInFinalTrack(Piece piece, int initialPosition, int diceValue) {
-        Player player = this.sessionState.getParchis().getCurrentPlayer();
-        int turnValue = this.sessionState.getParchis().getTurn().getCurrentPlayer();
-        FinalTrack finalTrack = this.sessionState.getParchis().getBoard().getFinalTracks()[turnValue];
+        Player player = this.gameState.getParchis().getCurrentPlayer();
+        int turnValue = this.gameState.getParchis().getTurn().getCurrentPlayer();
+        FinalTrack finalTrack = this.gameState.getParchis().getBoard().getFinalTracks()[turnValue];
         List<SquareSafe> squares = finalTrack.getSquares();
         int finalTrackSize = squares.size();
 
@@ -199,7 +204,7 @@ public class PlayResource {
         if (finalPosition == finalTrackSize) {
             player.getPieces().remove(piece);
             squares.get(initialPosition).removePiece(piece);
-            this.sessionState.getParchis().putPieceGoal(piece);
+            this.gameState.getParchis().putPieceGoal(piece);
         } else {
             if (finalPosition >= finalTrackSize) {
                 finalPosition = finalTrackSize - (finalPosition - finalTrackSize);
@@ -212,22 +217,22 @@ public class PlayResource {
     }
 
     public Boolean capturePiece() {
-        this.sessionState.getParchis().getDice().setValue(20);
-        boolean res = this.sessionState.getParchis().isCapture() && canMove();
+        this.gameState.getParchis().getDice().setValue(20);
+        boolean res = this.gameState.getParchis().isCapture() && canMove();
         if (!res) {
-            this.sessionState.getParchis().getDice().setValue(0);
+            this.gameState.getParchis().getDice().setValue(0);
         }
-        this.sessionState.getParchis().setCapture(false);
+        this.gameState.getParchis().setCapture(false);
         return res;
     }
 
     public Boolean arriveGoal() {
-        this.sessionState.getParchis().getDice().setValue(10);
-        boolean res = this.sessionState.getParchis().isArriveGoal() && canMove();
+        this.gameState.getParchis().getDice().setValue(10);
+        boolean res = this.gameState.getParchis().isArriveGoal() && canMove();
         if (!res) {
-            this.sessionState.getParchis().getDice().setValue(0);
+            this.gameState.getParchis().getDice().setValue(0);
         }
-        this.sessionState.getParchis().setArriveGoal(false);
+        this.gameState.getParchis().setArriveGoal(false);
         return res;
     }
 }

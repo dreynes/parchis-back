@@ -11,7 +11,7 @@ import static org.mockito.Mockito.when;
 public abstract class BaseMockTest {
 
     @Mock
-    protected SessionState sessionState;
+    protected GameState gameState;
 
     @Mock
     protected Parchis parchis;
@@ -47,7 +47,7 @@ public abstract class BaseMockTest {
     }
 
     private void configureCommonMocks() {
-        when(sessionState.getParchis()).thenReturn(parchis);
+        when(gameState.getParchis()).thenReturn(parchis);
         when(parchis.getDice()).thenReturn(dice);
         when(parchis.getTurn()).thenReturn(turn);
         when(parchis.getBoard()).thenReturn(board);

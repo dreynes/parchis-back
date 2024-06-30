@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 public class PlayControllerTest {
 
     @Mock
-    private SessionState sessionState;
+    private GameState gameState;
 
     @Mock
     private PlayResource playResource;
@@ -37,7 +37,7 @@ public class PlayControllerTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        when(sessionState.getParchis()).thenReturn(parchis);
+        when(gameState.getParchis()).thenReturn(parchis);
         when(parchis.getBoard()).thenReturn(board);
     }
 

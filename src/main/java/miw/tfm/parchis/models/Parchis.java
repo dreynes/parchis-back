@@ -1,5 +1,7 @@
 package miw.tfm.parchis.models;
 
+import miw.tfm.parchis.mongo.dto.ParchisEntity;
+
 import java.util.List;
 
 public class Parchis {
@@ -20,6 +22,14 @@ public class Parchis {
             this.players[i].setPath(BoardConstants.PATHS.get(i));
         }
         setPutPiecesInitialPosition();
+    }
+    public Parchis(ParchisEntity parchisEntity){
+        this.setBoard(parchisEntity.getBoard());
+        this.setTurn(parchisEntity.getTurn());
+        this.setPlayers(parchisEntity.getPlayers());
+        this.setDice(parchisEntity.getDice());
+        this.setCapture(parchisEntity.isCapture());
+        this.setArriveGoal(parchisEntity.isArriveGoal());
     }
 
 
