@@ -14,7 +14,6 @@ public class SquareExit extends SquareSafe {
         }
     }
     public boolean hasBlockade() {
-        System.out.println("comprueba bloqueo exit");
         if(this.getPieces().size()==2){
             return this.getPieces().get(0).getColor().equals(this.getPieces().get(1).getColor());
         }

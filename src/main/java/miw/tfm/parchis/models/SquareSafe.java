@@ -20,7 +20,6 @@ public class SquareSafe extends Square {
     }
 
     public boolean hasBlockade() {
-        System.out.println("comprueba bloqueo safe");
         if (this.getPieces().size() == 2)
             return this.getPieces().get(0).getColor().equals(this.getPieces().get(1).getColor());
         return false;

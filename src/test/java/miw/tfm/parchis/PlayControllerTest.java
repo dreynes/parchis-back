@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.Collections;
 import java.util.List;
@@ -70,6 +71,13 @@ public class PlayControllerTest {
         assertEquals(color, response.getBody());
     }
 
+    @Test
+    public void testGetTurn() {
+        Color color = Color.ROJO;
+        when(playResource.getTurn()).thenReturn(color);
+        ResponseEntity<Color> response = playController.getTurn();
+        assertEquals(color, response.getBody());
+    }
     @Test
     public void testCanMove() {
         when(playResource.canMove()).thenReturn(true);

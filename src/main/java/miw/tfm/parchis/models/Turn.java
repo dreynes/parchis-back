@@ -25,11 +25,4 @@ public class Turn {
         this.currentPlayer = currentPlayer;
     }
 
-    public int getNumberOfPlayers() {
-        return numberOfPlayers;
-    }
-
-    public void setNumberOfPlayers(int numberOfPlayers) {
-        this.numberOfPlayers = numberOfPlayers;
-    }
 }

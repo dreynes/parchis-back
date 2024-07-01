@@ -1,7 +1,6 @@
 package miw.tfm.parchis.models;
 
 import miw.tfm.parchis.mongo.dto.GameStateEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 
 @Component

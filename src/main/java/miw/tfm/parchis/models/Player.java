@@ -16,7 +16,6 @@ public class Player {
         this.color = color;
         this.pieces = new ArrayList<>();
         this.isTurn = false;
-
     }
 
     public String getName() {

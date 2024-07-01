@@ -7,8 +7,7 @@ public class Piece {
     private String color;
     private int position;
 
-    public Piece() {
-    }
+    public Piece() {}
 
     public Piece(String color) {
         this.color = color;

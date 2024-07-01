@@ -109,6 +109,19 @@ class PlayResourceTest {
 
 
     @Test
+    void getTurn_whenChangingTurn_shouldCycleThroughPlayers() {
+        Color color = playResource.getTurn();
+
+        playResource.changeTurn(); // Cambiar turno una vez
+        playResource.changeTurn(); // Cambiar turno una vez más
+        playResource.changeTurn(); // Cambiar turno una vez más
+        playResource.changeTurn(); // Cambiar turno una vez más
+
+        assertEquals(color, playResource.getTurn(), "Se ha completado el ciclo deberia tocar el mismo jugador");
+    }
+
+
+    @Test
     void changeTurn_shouldIncrementTurnAndResetDice() {
         Turn turn = parchis.getTurn();
         int initialPlayer = turn.getCurrentPlayer();

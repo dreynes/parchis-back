@@ -8,7 +8,6 @@ public class Home {
     private List<Piece> pieces;
 
 
-
     private String color;
     public Home(String color) {
         this.color = color;
@@ -36,7 +35,6 @@ public class Home {
                 this.pieces.add(piece);
                 return square;
             }
-
         }
         return null;
     }
@@ -55,9 +53,7 @@ public class Home {
     public boolean isEmpty(){
         return this.pieces.size()==0;
     }
-    public boolean isFull(){
-        return this.pieces.size()==4;
-    }
+    public boolean isFull(){ return this.pieces.size()==4; }
     public String getColor() {
         return this.color;
     }
