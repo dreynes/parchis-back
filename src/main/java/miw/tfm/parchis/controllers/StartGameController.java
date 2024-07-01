@@ -2,7 +2,7 @@ package miw.tfm.parchis.controllers;
 
 import jakarta.websocket.server.PathParam;
 import miw.tfm.parchis.models.*;
-import miw.tfm.parchis.services.SaveResource;
+import miw.tfm.parchis.services.OpenGameResource;
 import miw.tfm.parchis.services.StartGameResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,15 +17,15 @@ public class StartGameController {
     @Autowired
     private StartGameResource startGameResource;
     @Autowired
-    private SaveResource saveResource;
+    private OpenGameResource openResource;
 
     private final GameState gameState;
 
     @Autowired
-    public StartGameController(GameState gameState, StartGameResource startGameResource, SaveResource saveResource) {
+    public StartGameController(GameState gameState, StartGameResource startGameResource, OpenGameResource openResource) {
         this.gameState = gameState;
         this.startGameResource = startGameResource;
-        this.saveResource = saveResource;
+        this.openResource = openResource;
     }
 
 
@@ -38,11 +38,11 @@ public class StartGameController {
 
     @GetMapping("/open")
     public ResponseEntity<List<String>> open() {
-        return ResponseEntity.ok(saveResource.findGamesByUser(gameState.getUser().getUsername()));
+        return ResponseEntity.ok(openResource.findGamesByUser(gameState.getUser().getUsername()));
     }
     @PostMapping("/openGame")
     public ResponseEntity<Void> openGame(@PathParam("gameName") String gameName) {
-        List<GameState> gameStates = saveResource.findGamesByName(gameName);
+        List<GameState> gameStates = openResource.findGamesByName(gameName);
         gameState.setParchis(gameStates.get(0).getParchis());
         return ResponseEntity.ok().build();
     }

@@ -5,9 +5,7 @@ import miw.tfm.parchis.mongo.dto.GameStateEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class SaveResource {
@@ -16,7 +14,8 @@ public class SaveResource {
     private miw.tfm.parchis.repositories.GameStateRepository gameStateRepository;
 
     @Autowired
-    public SaveResource(GameState gameState) {
+    public SaveResource(GameState gameState, miw.tfm.parchis.repositories.GameStateRepository gameStateRepository) {
+        this.gameStateRepository = gameStateRepository;
         this.gameState = gameState;
     }
 
@@ -33,19 +32,7 @@ public class SaveResource {
         return true;
     }
 
-    public List<String> findGamesByUser(String username) {
-        List<GameStateEntity> gameStates = gameStateRepository.findByUser_Username(username);
-        return gameStates.stream()
-                .map(GameStateEntity::getGameName)
-                .collect(Collectors.toList());
-    }
 
-    public List<GameState> findGamesByName(String gameName) {
-        List<GameStateEntity> gameStates = gameStateRepository.findByGameName(gameName);
-        return gameStates.stream()
-                .map(GameState::new)
-                .collect(Collectors.toList());
-    }
 
     public Boolean canSave() {
         return this.gameState.getParchis().getDice().getValue()==0;
