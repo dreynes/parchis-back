@@ -3,10 +3,11 @@ package miw.tfm.parchis.services;
 import miw.tfm.parchis.models.GameState;
 import miw.tfm.parchis.mongo.dto.GameStateEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
+@Service
 public class OpenGameResource {
     @Autowired
     miw.tfm.parchis.repositories.GameStateRepository gameStateRepository;
